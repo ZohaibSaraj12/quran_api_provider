@@ -15,6 +15,7 @@ class TranslationProvider extends ChangeNotifier {
   List<Translation> get translation => _translation;
   String? get error => _error;
   int get length => _translation.length;
+
   TranslationProvider(int surahNumber) {
     fetchData(surahNumber);
   }

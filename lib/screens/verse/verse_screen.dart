@@ -24,137 +24,140 @@ class VerseScreen extends StatelessWidget {
         ),),
 
       ),
-      body: RepaintBoundary(
-        child: Builder(builder: (context) {
-          if (verseProvider.isLoading || translationProvider.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (verseProvider.error != null) {
-            return Center(child: Text("Couldn't find data Error ${verseProvider.error}"),);
-          }
-          if (verseProvider.ayahs.isEmpty || translationProvider.translation.isEmpty) {
-            return Center(child: Text("No data Found"),);
-          }
-          return Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Scrollbar(
-              interactive: true,
-              radius: Radius.circular(10.0),
-              thickness: 7.0,
-              thumbVisibility: true,
-              child: SingleChildScrollView(
-               physics: ClampingScrollPhysics(),
-                child: Center(
-                  child: Card(
-                    color: Colors.white,
-                    shadowColor: Colors.black,
-
-                    shape: RoundedRectangleBorder(
-                      side: BorderSide(
-                        color: Colors.green,
-                        width: 3
+      body: RefreshIndicator(
+        onRefresh: () => context.read<TranslationProvider>().fetchData(surahNumber),
+        child: RepaintBoundary(
+          child: Builder(builder: (context) {
+            if (verseProvider.isLoading || translationProvider.isLoading) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (verseProvider.error != null) {
+              return Center(child: Text("Couldn't find data Error ${verseProvider.error}"),);
+            }
+            if (verseProvider.ayahs.isEmpty || translationProvider.translation.isEmpty) {
+              return Center(child: Text("No data Found"),);
+            }
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Scrollbar(
+                interactive: true,
+                radius: Radius.circular(10.0),
+                thickness: 7.0,
+                thumbVisibility: true,
+                child: SingleChildScrollView(
+                 physics: ClampingScrollPhysics(),
+                  child: Center(
+                    child: Card(
+                      color: Colors.white,
+                      shadowColor: Colors.black,
+        
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: Colors.green,
+                          width: 3
+                        ),
+                        borderRadius: BorderRadius.circular(10.0),
+          
                       ),
-                      borderRadius: BorderRadius.circular(10.0),
+                     margin: EdgeInsets.all(20.0),
+                      elevation: 10,
+          
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+                        child: Column(
+          
+                          children: verseProvider.ayahs.asMap().entries.map((entry) {
+                            final index = entry.key;
+                            final verse = entry.value;
         
-                    ),
-                   margin: EdgeInsets.all(20.0),
-                    elevation: 10,
+                            final translationText = translationProvider.translation.length > index
+                                ? translationProvider.translation[index].text
+                                : "";
+                            return Column(
         
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-                      child: Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
         
-                        children: verseProvider.ayahs.asMap().entries.map((entry) {
-                          final index = entry.key;
-                          final verse = entry.value;
-
-                          final translationText = translationProvider.translation.length > index
-                              ? translationProvider.translation[index].text
-                              : "";
-                          return Column(
-
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-
-                                  children: [
-                                    Expanded(child: Divider()),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(verse.numberInSurah.toString(), style: TextStyle(
-                                        fontFamily: "SFPROBOLD",
-                                        fontSize: 20,
-                                        color: Colors.teal
-                                    ),),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Expanded(child: Divider()),
-                                  ],
+                                    children: [
+                                      Expanded(child: Divider()),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(verse.numberInSurah.toString(), style: TextStyle(
+                                          fontFamily: "SFPROBOLD",
+                                          fontSize: 20,
+                                          color: Colors.teal
+                                      ),),
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Expanded(child: Divider()),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(top:40.0),
-                                child: index == 0 ? surahNumber > 1 ? Text("${verse.text.substring(39)}\n",
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.center,
-
-                                  style: TextStyle(
-                                      fontFamily: "Arabic", fontSize: 30,
-
-
-                                  ),) : Text("${verse.text}\n",
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.center,
-
-                                  style: TextStyle(
-                                      fontFamily: "Arabic", fontSize: 32,
-
-
-                                  ),) : Text("${verse.text}\n",
-                                  textDirection: TextDirection.rtl,
-                                  textAlign: TextAlign.center,
-
-                                  style: TextStyle(
-                                      fontFamily: "Arabic", fontSize: 30,
-
-
-                                  ),),
-                              ),
-                              Text("Translation", style: TextStyle(
-                                fontSize: 25,
-                                fontFamily: "SFPROBOLD",
-                                fontWeight: FontWeight.w600,
-                                color: Colors.teal,
-                              ),),
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                child: Divider(),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(top: 10.0, bottom: 60, left: 20, right: 20.0),
-                                  child: Text(
-                                      translationText,
+                                Padding(
+                                  padding: const EdgeInsets.only(top:40.0),
+                                  child: index == 0 ? surahNumber > 1 ? Text("${verse.text.substring(39)}\n",
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+        
                                     style: TextStyle(
-                                      fontFamily: "SFPROBOLD",
-                                      fontSize: 15
-                                    ),
-                                  ))
-                            ],
-                          );
-                        }).toList(),
-
-                      ),
-                    )
+                                        fontFamily: "Arabic", fontSize: 30,
+        
+        
+                                    ),) : Text("${verse.text}\n",
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+        
+                                    style: TextStyle(
+                                        fontFamily: "Arabic", fontSize: 32,
+        
+        
+                                    ),) : Text("${verse.text}\n",
+                                    textDirection: TextDirection.rtl,
+                                    textAlign: TextAlign.center,
+        
+                                    style: TextStyle(
+                                        fontFamily: "Arabic", fontSize: 30,
+        
+        
+                                    ),),
+                                ),
+                                Text("Translation", style: TextStyle(
+                                  fontSize: 25,
+                                  fontFamily: "SFPROBOLD",
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.teal,
+                                ),),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                  child: Divider(),
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 10.0, bottom: 60, left: 20, right: 20.0),
+                                    child: Text(
+                                        translationText,
+                                      style: TextStyle(
+                                        fontFamily: "SFPROBOLD",
+                                        fontSize: 15
+                                      ),
+                                    ))
+                              ],
+                            );
+                          }).toList(),
+        
+                        ),
+                      )
+                    ),
                   ),
                 ),
               ),
-            ),
-          );
-        }),
+            );
+          }),
+        ),
       ),
     );
   }
